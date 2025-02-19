@@ -12,7 +12,7 @@ async function sendMessageToUser(campaignId, user, message_template) {
 
         const body = {
             messaging_product: "whatsapp",
-            to: user.phone,
+            to: "918003074521",
             type: "template",
             template: {
                 name: message_template,
