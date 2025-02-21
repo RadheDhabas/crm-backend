@@ -5,7 +5,8 @@ const CampaignSchema = new mongoose.Schema({
     segment: { type: mongoose.Schema.Types.ObjectId, ref: 'Segment', required: true },
     runTime: { type: Date, required: true },
     meta_template: {
-        type: String, required: true
+        template_name: { type: String, required: true },
+        language: { type: String, required: true }
     },
     status: {
         type: String,

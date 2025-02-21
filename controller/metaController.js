@@ -14,6 +14,7 @@ export const getWhatsAppTemplates = async (req, res) => {
             {
                 id:item.id,
                 template_name: item.name,
+                language:item.language,
                 content: item.components.map((i) => ({ "type": i.type, "text": i.text }))
             }
         ));

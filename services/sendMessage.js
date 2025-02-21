@@ -1,7 +1,7 @@
 import Campaign from "../models/Campaign.js";
 
 
-async function sendMessageToUser(campaignId, user, message_template) {
+async function sendMessageToUser(campaignId, user,template) {
     try {
         const headers = {
             "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
@@ -9,14 +9,14 @@ async function sendMessageToUser(campaignId, user, message_template) {
         };
         // I can fetch templates from meta using template name
         const url = `https://graph.facebook.com/${process.env.VERSION}/${process.env.PHONE_NUMBER_ID}/messages`;
-
+console.log(template);
         const body = {
             messaging_product: "whatsapp",
-            to: "918003074521",
+            to: user.phone,
             type: "template",
             template: {
-                name: message_template,
-                language: { code: "en_US" }
+                name: template.message_template,
+                language: { code: template.language }
             }
         };
 

@@ -15,7 +15,7 @@ export const scheduleCampaign = async (req, res) => {
       const cronTime = `${runDateTime.getUTCMinutes()} ${runDateTime.getUTCHours()} ${runDateTime.getUTCDate()} ${runDateTime.getUTCMonth() + 1} *`;
 
       const job = cron.schedule(cronTime, async () => {
-        await processCampaign(campaign._id);
+        await processCampaign(campaign._id,language);
       }, {
         timezone: "UTC"
       });
@@ -41,7 +41,7 @@ async function processCampaign(campaignId) {
     const users = await fetchSegmentedUsers(campaign.segment);
     console.log("Messages sending process started...");
     for (let user of users) {
-      await sendMessageToUser(campaignId, user, campaign.meta_template);
+      await sendMessageToUser(campaignId, user, campaign.meta_template, language);
     }
 
     campaign.status = "completed";
