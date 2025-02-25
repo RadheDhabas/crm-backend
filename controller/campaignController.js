@@ -34,6 +34,7 @@ async function processCampaign(campaign) {
 
     const users = await fetchSegmentedUsers(campaign.segment);
     console.log("Messages sending process started...");
+    
     for (let user of users) {
       await sendMessageToUser(campaign, user);
     }

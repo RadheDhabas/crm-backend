@@ -4,10 +4,7 @@ const CampaignSchema = new mongoose.Schema({
     campaign_name: { type: String, required: true, unique: true },
     segment: { type: mongoose.Schema.Types.ObjectId, ref: 'Segment', required: true },
     runTime: { type: Date, required: true },
-    meta_template: {
-        template_name: { type: String, required: true },
-        language: { type: String, required: true }
-    },
+    meta_template: { type: String, required: true },
     status: {
         type: String,
         enum: ['scheduled', 'running', 'completed', 'stoped'],
@@ -16,7 +13,8 @@ const CampaignSchema = new mongoose.Schema({
     stats: {
         sent: { type: Number, default: 0 },
         delivered: { type: Number, default: 0 },
-        viewed: { type: Number, default: 0 }
+        viewed: { type: Number, default: 0 },
+        failed: { type: Number, default: 0 },
     },
     message_status: [{
         message_id:{type: String, default: ""},

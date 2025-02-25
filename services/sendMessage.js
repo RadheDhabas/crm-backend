@@ -1,21 +1,25 @@
+import axios from "axios";
 import Campaign from "../models/Campaign.js";
 
 
 async function sendMessageToUser(campaign, user) {
     try {
+
         const headers = {
             "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
             "Content-Type": "application/json"
         };
-        // I can fetch templates from meta using template name
+        // I can fetch templates from meta using template id
+        const template = await fetchWhatsAppTemplate(campaign.meta_template);
+
         const url = `https://graph.facebook.com/${process.env.VERSION}/${process.env.PHONE_NUMBER_ID}/messages`;
         const body = {
             messaging_product: "whatsapp",
             to: user.phoneId,
             type: "template",
             template: {
-                name: campaign.meta_template.template_name,
-                language: { code: campaign.meta_template.language }
+                name: template.name,
+                language: { code: template.language }
             }
         };
 
@@ -89,6 +93,21 @@ const handelWebhookEvent = async (userPhoneId, messageStatus, message_id) => {
         }
     } catch (error) {
         console.log("Error while updating stats in webhook event.")
+    }
+}
+const fetchWhatsAppTemplate = async () => {
+
+    try {
+        const headers = {
+            "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+        };
+
+        const url = `https://graph.facebook.com/${process.env.VERSION}/725061719810861`;
+        const response = await axios.get(url, { headers });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching template:", error.response?.data || error.message);
     }
 }
 
