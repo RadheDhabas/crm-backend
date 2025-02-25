@@ -9,12 +9,11 @@ async function handelMessages(req,res){
       body.entry?.[0]?.changes?.[0]?.value?.statuses
     ) {
       const statusUpdate = body.entry?.[0]?.changes?.[0]?.value?.statuses[0];
-      const status = body.entry?.[0]?.changes?.[0]?.value?.statuses[0]?.status;
       const recipientPhone = statusUpdate.recipient_id;
       const messageStatus = statusUpdate.status;
+      const id = statusUpdate.id;
 
-      console.log('Received a WhatsApp status update in webhook route ---->',status);
-      await handelWebhookEvent(recipientPhone,messageStatus);
+      await handelWebhookEvent(recipientPhone,messageStatus,id);
       return res.status(200).json({ status: 'ok' });
     }
   

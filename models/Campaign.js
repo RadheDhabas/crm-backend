@@ -19,8 +19,9 @@ const CampaignSchema = new mongoose.Schema({
         viewed: { type: Number, default: 0 }
     },
     message_status: [{
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        status: { type: String, enum: ['sent', 'delivered', 'viewed', 'failed'], required: true },
+        message_id:{type: String, default: ""},
+        userPhoneId: { type: String, required: true },
+        status: { type: String, enum: ['sent', 'failed'], required: true },
         timestamp: { type: Date, default: Date.now }
     }],
     createdAt: { type: Date, default: Date.now },

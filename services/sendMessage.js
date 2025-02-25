@@ -1,7 +1,7 @@
 import Campaign from "../models/Campaign.js";
 
 
-async function sendMessageToUser(campaignId, user,template) {
+async function sendMessageToUser(campaign, user) {
     try {
         const headers = {
             "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
@@ -9,14 +9,13 @@ async function sendMessageToUser(campaignId, user,template) {
         };
         // I can fetch templates from meta using template name
         const url = `https://graph.facebook.com/${process.env.VERSION}/${process.env.PHONE_NUMBER_ID}/messages`;
-console.log(template);
         const body = {
             messaging_product: "whatsapp",
-            to: user.phone,
+            to: user.phoneId,
             type: "template",
             template: {
-                name: template.message_template,
-                language: { code: template.language }
+                name: campaign.meta_template.template_name,
+                language: { code: campaign.meta_template.language }
             }
         };
 
@@ -28,17 +27,16 @@ console.log(template);
         });
 
         const data = await response.json();
-        console.log("Response after sending message: ", data, ", response end.");
-
         if (data && data.messages && data.messages[0].message_status === 'accepted') {
-            await updateCampaignStats(campaignId, 'sent');
-            await updateMessageStatus(campaignId, user._id, 'sent');
+            await updateMessageStatus(campaign.id, user.phoneId, 'sent', data.messages[0].id);
         } else {
-            await updateMessageStatus(campaignId, user._id, 'failed');
+            await updateMessageStatus(campaign.id, user.phoneId, 'failed', "");
+            await updateCampaignStats(campaign.id, "failed");
         }
     } catch (error) {
         console.error("Error sending message:", error);
-        await updateMessageStatus(campaignId, user._id, 'failed');
+        await updateMessageStatus(campaign.id, user.phoneId, 'failed', "");
+        await updateCampaignStats(campaign.id, "failed");
     }
 }
 
@@ -63,13 +61,14 @@ async function updateCampaignStats(campaignId, status) {
 }
 
 // Update message status for each user in the campaign
-async function updateMessageStatus(campaignId, userId, status) {
+async function updateMessageStatus(campaignId, phoneId, status, message_id) {
     const campaign = await Campaign.findById(campaignId);
     if (!campaign) return;
 
     const messageStatus = {
-        user: userId,
-        status: status, // sent, delivered, viewed, failed
+        message_id: message_id,
+        userPhoneId: phoneId,
+        status: status, // sent, failed
         timestamp: new Date()
     };
 
@@ -77,11 +76,16 @@ async function updateMessageStatus(campaignId, userId, status) {
     await campaign.save();
 }
 
-const handelWebhookEvent = async (recipientPhone, messageStatus) => {
+const handelWebhookEvent = async (userPhoneId, messageStatus, message_id) => {
+    userPhoneId = "+" + userPhoneId;
     try {
-        const campaign = await Campaign.findOne({ "message_status.user": recipientPhone });
+        const campaign = await Campaign.findOne({
+            message_status: {
+                $elemMatch: { userPhoneId: userPhoneId, message_id: message_id }
+            }
+        });
         if (campaign) {
-            updateCampaignStats(campaign._id,messageStatus);
+            await updateCampaignStats(campaign._id, messageStatus);
         }
     } catch (error) {
         console.log("Error while updating stats in webhook event.")

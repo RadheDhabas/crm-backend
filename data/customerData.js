@@ -2,7 +2,7 @@ export const customers = [
     {
         id: "USR123456",
         name: "John Doe",
-        phone: "+918003074521",
+        phoneId: "+918003074521",
         email: "johndoe@example.com",
         city: "New York",
         country: "USA",
