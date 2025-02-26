@@ -17,7 +17,6 @@ export const scheduleCampaign = async (req, res) => {
       timezone: "UTC"
     });
     console.log(`📅 Campaign "${campaign.campaign_name}" scheduled for ${runDateTime}`);
-
     return res.send({
       success: true
     });
